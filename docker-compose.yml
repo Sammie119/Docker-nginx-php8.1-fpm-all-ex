@@ -1,15 +1,17 @@
 version: '3.8'
 
 services:
-  web:
+  nginx-payroll:
     image: sammie119/nginx-php8.1-fpm-all-ex
-    container_name: acts-nginx
+    shm_size: '2gb'
+    container_name: acts-nginx-
     #restart: always
     ports:
-        - "8080:8080"
+        - "9000:8080"
+    tty: true
     volumes:
         - ./src/public:/var/www/html
-        - ./config/conf.d:/etc/nginx/conf.d
+        - ./config/conf.d/default.conf:/etc/nginx/conf.d/default.conf
         - ./config/nginx.conf:/etc/nginx/nginx.conf
         # link data to storage area of the app.
         - ./data:/var/www/html/storage/salary_pdf
@@ -20,5 +22,115 @@ services:
     networks:
         - nginxphp
 
+  nginx-olddb:
+    image: sammie119/nginx-php8.1-fpm-all-ex
+    shm_size: '2gb'
+    container_name: tac-nginx
+    #restart: always
+    ports:
+      - "8000:8080"
+    tty: true
+    volumes:
+      - ./src/tac_college:/var/www/html
+      - ./config/conf.d/tac.college.conf:/etc/nginx/conf.d/default.conf
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      # link data to storage area of the app.
+      - ./data:/var/www/html/storage/salary_pdf
+
+      - ./config/new-php.ini:/etc/php81/php.ini
+      # - ./config/php_ini_conf.d:/etc/php81/conf.d
+      # - ./config/php-fpm-settings.conf:/etc/php8/php-fpm.d/server.conf
+    networks:
+      - nginxphp
+
+  # pgdb:
+  #   image: postgres:15.2-alpine3.17 #postgres:14.2-alpine
+  #   shm_size: '2gb'
+  #   container_name: acts-pgdb
+  #   # restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "5"
+  #   networks:
+  #     - nginxphp
+  #   ports:
+  #     - 5433:5432
+  #   volumes: 
+  #     - ./db/initdb/pgdb/1_full_rho_erp_db_schemas.sql:/docker-entrypoint-initdb.d/1_full_rho_erp_db_schemas.sql
+  #     - ./db/db_dirs:/opt/apache
+  #     #Uncomment 2nd Volume for persistent Data
+  #     #NB: Not uncommenting might cause data loss when docker-compose down is run
+  #     - ./db/db_data/pgdb:/var/lib/postgresql/data
+  #     - ./db/conf/postgresql.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_DB: acts_payroll_system
+  #     POSTGRES_PASSWORD: Sammie@119
+  #     PGDATA: /var/lib/postgresql/data/pgdata
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:6.20
+  #   shm_size: '2gb'
+  #   # restart: always
+  #   container_name: acts-pgadmin
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "5"
+  #   networks:
+  #     - nginxphp
+  #   ports:
+  #     - 8072:80
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=info@acts.net
+  #     - PGADMIN_DEFAULT_PASSWORD=Sammie@119  
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    shm_size: '2gb'
+    # restart: always
+    container_name: acts-phpmyadmin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+    ports:
+      - 7007:80
+    environment:
+      PMA_HOST: mysqldb
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      PMA_USER: root
+      PMA_PASSWORD: Sammie@119
+    networks:
+      - nginxphp
+    volumes:
+      - ./db/phpmyadmin/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+
+  mysqldb:
+    image: mariadb
+    #  restart: always
+    container_name: acts-mysqldb
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+    ports:
+      - 3307:3306
+    networks:
+      - nginxphp
+    volumes:
+      - ./db/db_data/mysqldb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Sammie@119
+      MYSQL_DATABASE: acts_payroll_system
+
+volumes:
+  site:
 networks:
   nginxphp:
