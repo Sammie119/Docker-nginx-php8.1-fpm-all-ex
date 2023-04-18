@@ -24,6 +24,7 @@ RUN apk add --no-cache \
   php81-session \
   php81-xml \
   php81-xmlreader \
+  php81-xmlwriter \
   supervisor
 
 RUN apk add --no-cache --update --upgrade --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \

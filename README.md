@@ -116,5 +116,5 @@ The Docker compose creates two containers
 - run stop-acts.sh
 
 # To built the image
-docker build -t sammie119/nginx-php8.1-fpm-all-ex .
-docker push sammie119/nginx-php8.1-fpm-all-ex
+- docker build -t sammie119/nginx-php8.1-fpm-all-ex .
+- docker push sammie119/nginx-php8.1-fpm-all-ex

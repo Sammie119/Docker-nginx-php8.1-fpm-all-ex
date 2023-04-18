@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   nginx-payroll:
-    image: sammie119/nginx-php8.1-fpm-all-ex
+    image: sammie119/nginx-php8.1-fpm-all-ex:v1.0
     shm_size: '2gb'
     container_name: acts-nginx-
     #restart: always
@@ -11,7 +11,7 @@ services:
     tty: true
     volumes:
         - ./src/public:/var/www/html
-        - ./config/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+        - ./config/conf.d:/etc/nginx/conf.d
         - ./config/nginx.conf:/etc/nginx/nginx.conf
         # link data to storage area of the app.
         - ./data:/var/www/html/storage/salary_pdf
@@ -32,7 +32,7 @@ services:
     tty: true
     volumes:
       - ./src/tac_college:/var/www/html
-      - ./config/conf.d/tac.college.conf:/etc/nginx/conf.d/default.conf
+      - ./config/tac.conf.d:/etc/nginx/conf.d
       - ./config/nginx.conf:/etc/nginx/nginx.conf
       # link data to storage area of the app.
       - ./data:/var/www/html/storage/salary_pdf
