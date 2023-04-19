@@ -4,7 +4,7 @@ services:
   nginx-payroll:
     image: sammie119/nginx-php8.1-fpm-all-ex:v1.0
     shm_size: '2gb'
-    container_name: acts-nginx-
+    container_name: acts-nginx
     #restart: always
     ports:
         - "9000:8080"
@@ -88,29 +88,6 @@ services:
   #     - PGADMIN_DEFAULT_EMAIL=info@acts.net
   #     - PGADMIN_DEFAULT_PASSWORD=Sammie@119  
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    shm_size: '2gb'
-    # restart: always
-    container_name: acts-phpmyadmin
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "5"
-    ports:
-      - 7007:80
-    environment:
-      PMA_HOST: mysqldb
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
-      PMA_USER: root
-      PMA_PASSWORD: Sammie@119
-    networks:
-      - nginxphp
-    volumes:
-      - ./db/phpmyadmin/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
-
   mysqldb:
     image: mariadb
     #  restart: always
@@ -129,6 +106,51 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: Sammie@119
       MYSQL_DATABASE: acts_payroll_system
+      
+  ###########################################
+  ###Choose between phpmyadmin and adminer### 
+  ###########################################   
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    shm_size: '2gb'
+    # restart: always
+    container_name: acts-phpmyadmin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+    ports:
+      - 7007:80
+    environment:
+      PMA_HOST: mysqldb
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      # PMA_USER: root
+      # PMA_PASSWORD: Sammie@119
+    networks:
+      - nginxphp
+    volumes:
+      - ./db/phpmyadmin/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+
+  adminer:
+    image: adminer:latest
+    shm_size: '2gb'
+    #restart: always
+    container_name: acts-adminer
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+    ports:
+      - 7009:8080
+    environment:
+      ADMINER_DEFAULT_SERVER: acts-mysqldb
+    networks:
+      - nginxphp
+    volumes:
+      - ./db/phpmyadmin/uploads.ini:/etc/php/7.4/cli/conf.d/0-upload_large_dumps.ini
 
 volumes:
   site:
